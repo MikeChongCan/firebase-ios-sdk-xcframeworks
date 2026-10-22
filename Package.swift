@@ -12,12 +12,12 @@ let package = Package(
       targets: ["FirebaseABTestingTarget"]
     ),
     .library(
-      name: "FirebaseAnalytics",
-      targets: ["FirebaseAnalyticsTarget"]
+      name: "FirebaseAILogic",
+      targets: ["FirebaseAILogicTarget"]
     ),
     .library(
-      name: "FirebaseAnalyticsOnDeviceConversion",
-      targets: ["FirebaseAnalyticsOnDeviceConversionTarget"]
+      name: "FirebaseAnalytics",
+      targets: ["FirebaseAnalyticsTarget"]
     ),
     .library(
       name: "FirebaseAppCheck",
@@ -40,10 +40,6 @@ let package = Package(
       targets: ["FirebaseDatabaseTarget"]
     ),
     .library(
-      name: "FirebaseDynamicLinks",
-      targets: ["FirebaseDynamicLinksTarget"]
-    ),
-    .library(
       name: "FirebaseFirestore",
       targets: ["FirebaseFirestoreTarget"]
     ),
@@ -54,10 +50,6 @@ let package = Package(
     .library(
       name: "FirebaseInAppMessaging",
       targets: ["FirebaseInAppMessagingTarget"]
-    ),
-    .library(
-      name: "FirebaseMLModelDownloader",
-      targets: ["FirebaseMLModelDownloaderTarget"]
     ),
     .library(
       name: "FirebaseMessaging",
@@ -74,14 +66,6 @@ let package = Package(
     .library(
       name: "FirebaseStorage",
       targets: ["FirebaseStorageTarget"]
-    ),
-    .library(
-      name: "Google-Mobile-Ads-SDK",
-      targets: ["Google-Mobile-Ads-SDKTarget"]
-    ),
-    .library(
-      name: "GoogleSignIn",
-      targets: ["GoogleSignInTarget"]
     )
   ],
   dependencies: [
@@ -101,6 +85,21 @@ let package = Package(
       path: "Sources/FirebaseABTesting"
     ),
     .target(
+      name: "FirebaseAILogicTarget",
+      dependencies: [
+        "Firebase",
+        "FirebaseAnalyticsTarget",
+        "_AppCheckCore",
+        "_FirebaseAILogic",
+        "_FirebaseAppCheck",
+        "_FirebaseAppCheckInterop",
+        "_FirebaseAuthInterop",
+        "_FirebaseCoreExtension",
+        .target(name: "_RecaptchaInterop", condition: .when(platforms: [.iOS]))
+      ],
+      path: "Sources/FirebaseAILogic"
+    ),
+    .target(
       name: "FirebaseAnalyticsTarget",
       dependencies: [
         "Firebase",
@@ -109,21 +108,12 @@ let package = Package(
         "_FirebaseCore",
         "_FirebaseCoreInternal",
         "_FirebaseInstallations",
+        .target(name: "_GoogleAdsOnDeviceConversion", condition: .when(platforms: [.iOS])),
         "_GoogleAppMeasurement",
         "_GoogleUtilities",
         "_nanopb"
       ],
       path: "Sources/FirebaseAnalytics"
-    ),
-    .target(
-      name: "FirebaseAnalyticsOnDeviceConversionTarget",
-      dependencies: [
-        "Firebase",
-        "FirebaseAnalyticsTarget",
-        .target(name: "_FirebaseAnalyticsOnDeviceConversion", condition: .when(platforms: [.iOS])),
-        .target(name: "_GoogleAppMeasurementOnDeviceConversion", condition: .when(platforms: [.iOS]))
-      ],
-      path: "Sources/FirebaseAnalyticsOnDeviceConversion"
     ),
     .target(
       name: "FirebaseAppCheckTarget",
@@ -132,7 +122,8 @@ let package = Package(
         "FirebaseAnalyticsTarget",
         "_AppCheckCore",
         "_FirebaseAppCheck",
-        "_FirebaseAppCheckInterop"
+        "_FirebaseAppCheckInterop",
+        .target(name: "_RecaptchaInterop", condition: .when(platforms: [.iOS]))
       ],
       path: "Sources/FirebaseAppCheck"
     ),
@@ -152,6 +143,8 @@ let package = Package(
         "FirebaseAnalyticsTarget",
         "_FirebaseAppCheckInterop",
         "_FirebaseAuth",
+        "_FirebaseAuthInterop",
+        "_FirebaseCoreExtension",
         "_GTMSessionFetcher",
         .target(name: "_RecaptchaInterop", condition: .when(platforms: [.iOS]))
       ],
@@ -166,8 +159,7 @@ let package = Package(
         "_FirebaseCrashlytics",
         "_FirebaseRemoteConfigInterop",
         "_FirebaseSessions",
-        "_GoogleDataTransport",
-        "_Promises"
+        "_GoogleDataTransport"
       ],
       path: "Sources/FirebaseCrashlytics",
       exclude: [
@@ -188,15 +180,6 @@ let package = Package(
       path: "Sources/FirebaseDatabase"
     ),
     .target(
-      name: "FirebaseDynamicLinksTarget",
-      dependencies: [
-        "Firebase",
-        "FirebaseAnalyticsTarget",
-        .target(name: "_FirebaseDynamicLinks", condition: .when(platforms: [.iOS]))
-      ],
-      path: "Sources/FirebaseDynamicLinks"
-    ),
-    .target(
       name: "FirebaseFirestoreTarget",
       dependencies: [
         "Firebase",
@@ -212,10 +195,7 @@ let package = Package(
         "_leveldb",
         "_openssl_grpc"
       ],
-      path: "Sources/FirebaseFirestore",
-      exclude: [
-        "Resources"
-      ]
+      path: "Sources/FirebaseFirestore"
     ),
     .target(
       name: "FirebaseFunctionsTarget",
@@ -240,21 +220,7 @@ let package = Package(
         "_FirebaseABTesting",
         .target(name: "_FirebaseInAppMessaging", condition: .when(platforms: [.iOS]))
       ],
-      path: "Sources/FirebaseInAppMessaging",
-      exclude: [
-        "Resources"
-      ]
-    ),
-    .target(
-      name: "FirebaseMLModelDownloaderTarget",
-      dependencies: [
-        "Firebase",
-        "FirebaseAnalyticsTarget",
-        "_FirebaseMLModelDownloader",
-        "_GoogleDataTransport",
-        "_SwiftProtobuf"
-      ],
-      path: "Sources/FirebaseMLModelDownloader"
+      path: "Sources/FirebaseInAppMessaging"
     ),
     .target(
       name: "FirebaseMessagingTarget",
@@ -278,8 +244,7 @@ let package = Package(
         "_FirebaseRemoteConfigInterop",
         "_FirebaseSessions",
         "_FirebaseSharedSwift",
-        "_GoogleDataTransport",
-        "_Promises"
+        "_GoogleDataTransport"
       ],
       path: "Sources/FirebasePerformance"
     ),
@@ -308,277 +273,210 @@ let package = Package(
       ],
       path: "Sources/FirebaseStorage"
     ),
-    .target(
-      name: "Google-Mobile-Ads-SDKTarget",
-      dependencies: [
-        "Firebase",
-        "FirebaseAnalyticsTarget",
-        .target(name: "_GoogleMobileAds", condition: .when(platforms: [.iOS])),
-        .target(name: "_UserMessagingPlatform", condition: .when(platforms: [.iOS]))
-      ],
-      path: "Sources/Google-Mobile-Ads-SDK"
-    ),
-    .target(
-      name: "GoogleSignInTarget",
-      dependencies: [
-        "Firebase",
-        "FirebaseAnalyticsTarget",
-        .target(name: "_AppAuth", condition: .when(platforms: [.iOS])),
-        .target(name: "_GTMAppAuth", condition: .when(platforms: [.iOS])),
-        "_GTMSessionFetcher",
-        .target(name: "_GoogleSignIn", condition: .when(platforms: [.iOS]))
-      ],
-      path: "Sources/GoogleSignIn"
-    ),
-    .binaryTarget(
-      name: "_AppAuth",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_AppAuth.xcframework.zip",
-      checksum: "b25bf2d6f8d53159695862e27970a490838c27782f1b49339a3d115d32381a14"
-    ),
     .binaryTarget(
       name: "_AppCheckCore",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_AppCheckCore.xcframework.zip",
-      checksum: "99c2eaec35bf77c1d663c4c23dd79a1194e1b2ce4149c4db5c52167587126b2c"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_AppCheckCore.xcframework.zip",
+      checksum: "5ee867acfcc330f5fd3322b4df7ed7ca2a3e39e3c9e5522c1e20d38b131efaab"
     ),
     .binaryTarget(
       name: "_FBLPromises",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FBLPromises.xcframework.zip",
-      checksum: "2bb9b7643470f8ef1be70c969a46fb15020e6470952beb858b9920a129678870"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FBLPromises.xcframework.zip",
+      checksum: "e56b043fa5781485f17118b39c7d4b8c25d43edf9f9e0441a06f398e95c1e774"
     ),
     .binaryTarget(
       name: "_FirebaseABTesting",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseABTesting.xcframework.zip",
-      checksum: "71ef6dc591dc90234fc213cb8658887b28185441714a3fbaf7c352015679ccb8"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseABTesting.xcframework.zip",
+      checksum: "27cd49f84c61adf33c26c8d0796d46635cb006b884941b577037da1b5bbb27e2"
+    ),
+    .binaryTarget(
+      name: "_FirebaseAILogic",
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseAILogic.xcframework.zip",
+      checksum: "7db42d009fbb6a305475b6f8c91526028c40307eb2fa2403c9f25da56536f189"
     ),
     .binaryTarget(
       name: "_FirebaseAnalytics",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseAnalytics.xcframework.zip",
-      checksum: "3959e93f60b6c65bf23d89770bd15ce4cc10ed7ae734491938d5e193aea04523"
-    ),
-    .binaryTarget(
-      name: "_FirebaseAnalyticsOnDeviceConversion",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseAnalyticsOnDeviceConversion.xcframework.zip",
-      checksum: "eb4f1cd3ffe41b083af167ebed882d8c1509ba8d87ad50e86ca3c221dc82bbb1"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseAnalytics.xcframework.zip",
+      checksum: "4b6d2522493637a1c119397de159e410a668732d0598c7a2e5a02b05fee83be3"
     ),
     .binaryTarget(
       name: "_FirebaseAppCheck",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseAppCheck.xcframework.zip",
-      checksum: "3adf79f37d7bb7833e5a2721d69693f4c78c02eed0d1261c00a5d2d339b58ba1"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseAppCheck.xcframework.zip",
+      checksum: "324d855cf961b2724301a990698ed0a374cf286ba57d0d76bf24b4443489609b"
     ),
     .binaryTarget(
       name: "_FirebaseAppCheckInterop",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseAppCheckInterop.xcframework.zip",
-      checksum: "d56d65470789e32ecf00ee0cf58240f481c5fc3c7f39499b1c7188809d809c2c"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseAppCheckInterop.xcframework.zip",
+      checksum: "db1de166f3071caab88c024c44aa9ac042be9c7266904e6a3f406525c56670fa"
     ),
     .binaryTarget(
       name: "_FirebaseAppDistribution",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseAppDistribution.xcframework.zip",
-      checksum: "71c8db0f3b967ba0df5b6548fc6a938ec6edb48e40c7c35e858721318019d9af"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseAppDistribution.xcframework.zip",
+      checksum: "656f1b69862596ddf40b51ee7358e3bd87e355ed2e118b2f72919d73c7394bea"
     ),
     .binaryTarget(
       name: "_FirebaseAuth",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseAuth.xcframework.zip",
-      checksum: "be7362e6df186337f690b3cbc628e14daedde5c28c9c56bd17ed771695a1a00d"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseAuth.xcframework.zip",
+      checksum: "d8be49db8355c1b8f9d7aa81973ca19a207ab7fd47d5aa5653609fbce9f396ff"
     ),
     .binaryTarget(
       name: "_FirebaseAuthInterop",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseAuthInterop.xcframework.zip",
-      checksum: "87af4d21715e254d45692a4e6a42d375f38163dd90bff07965acbb6f32d28734"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseAuthInterop.xcframework.zip",
+      checksum: "e60f558a87f075da8b1cae0ee5b4a2a6cd3d438198058a872e72829c2816d6c3"
     ),
     .binaryTarget(
       name: "_FirebaseCore",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseCore.xcframework.zip",
-      checksum: "d8e26f97b1a6f4a7cadc9e667d3399c0aca46b438e86e3811c31d1ddc5a2bc2b"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseCore.xcframework.zip",
+      checksum: "855de8c334f8e733ad3764d9d889fa312c830d6047b9b7609fa6b7080f8cb508"
     ),
     .binaryTarget(
       name: "_FirebaseCoreExtension",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseCoreExtension.xcframework.zip",
-      checksum: "4ccb6a7595399f95da99b2d01093832c5353f2abc4e7fcb9a510f9e1c9a24ab9"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseCoreExtension.xcframework.zip",
+      checksum: "ec16608f2745f5e7964a254b9bf0d2871c655ea0b2d35ab4d9001497b16aa030"
     ),
     .binaryTarget(
       name: "_FirebaseCoreInternal",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseCoreInternal.xcframework.zip",
-      checksum: "792f0aae66261191148f35b4cecb63fe88c6536b30bc62c54c82ad503227e89c"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseCoreInternal.xcframework.zip",
+      checksum: "714f860d642c1925f7fe6966ca52b9d750e3a82c2010e851026498da813263f9"
     ),
     .binaryTarget(
       name: "_FirebaseCrashlytics",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseCrashlytics.xcframework.zip",
-      checksum: "75fc7a1b4b3f49d88842af8857aaf6a9a248065e9be515dadcda8ab1a2802f80"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseCrashlytics.xcframework.zip",
+      checksum: "2c8b30068e37dcad0ad83206e743e674a8a9edf975b10b505326c374c8a8f51b"
     ),
     .binaryTarget(
       name: "_FirebaseDatabase",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseDatabase.xcframework.zip",
-      checksum: "dac72e7b6fd783c19d683c731027dd39dbf06af9b050975ec608a5f64d456158"
-    ),
-    .binaryTarget(
-      name: "_FirebaseDynamicLinks",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseDynamicLinks.xcframework.zip",
-      checksum: "015c30abc36bc181fdee2ea94942acd9baa01d118ce2eb4b0e5d2ca7bc65899d"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseDatabase.xcframework.zip",
+      checksum: "18233bea6d226d6148061826621cc83a7cd3c273bee9c4a8f0d2e7753cb621b8"
     ),
     .binaryTarget(
       name: "_FirebaseFirestore",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseFirestore.xcframework.zip",
-      checksum: "2108c36b1e134d47eb3f0c8386dcd86ed49de6d15efcca57b6940546eb5f4c71"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseFirestore.xcframework.zip",
+      checksum: "1c985a135673c489db35183959c8029d2fce82ec44c6729588af6bf175c44ad4"
     ),
     .binaryTarget(
       name: "_FirebaseFirestoreInternal",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseFirestoreInternal.xcframework.zip",
-      checksum: "753ccf95ca437bdcb758c08d250705378d2779b77d75737c8d0ad6c996b7d12f"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseFirestoreInternal.xcframework.zip",
+      checksum: "138d5e520730cbfa9f506f9725d2f24cf0ca1b4df6aee3f5289c49e93383aed2"
     ),
     .binaryTarget(
       name: "_FirebaseFunctions",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseFunctions.xcframework.zip",
-      checksum: "e0f760ff968e1476ed1de54200a926b3ff41982c31b3adbcba36e182dfab35ac"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseFunctions.xcframework.zip",
+      checksum: "3f34c1959d0fc1c7725725610bd4a0972fe6fd64bf19a39f455e76f35f942cbf"
     ),
     .binaryTarget(
       name: "_FirebaseInAppMessaging",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseInAppMessaging.xcframework.zip",
-      checksum: "b46768d60b81a1f18c279b284b307511c64788e79ba64dc2e57d06c0ecb6b7da"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseInAppMessaging.xcframework.zip",
+      checksum: "8fc250cd2746a2dd2527f42d6af1a9e067596436aef9d0c087e7ef83e05b9828"
     ),
     .binaryTarget(
       name: "_FirebaseInstallations",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseInstallations.xcframework.zip",
-      checksum: "ebed4be23e6caf5dab8909ed5d88f95c596a8c4186a9660ad402fd7fec84b8dd"
-    ),
-    .binaryTarget(
-      name: "_FirebaseMLModelDownloader",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseMLModelDownloader.xcframework.zip",
-      checksum: "30f6deb701793d558dcfdacaaa38b50748bc449f1f293332e508bb74e6e54fe5"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseInstallations.xcframework.zip",
+      checksum: "6580856e9bdb34237b86623e08f70220ceb03d2afec800c7b3f3ed9c359c9263"
     ),
     .binaryTarget(
       name: "_FirebaseMessaging",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseMessaging.xcframework.zip",
-      checksum: "f4faa0257a381623b40aaf1ff6fdcdd31636705644af5b6745cfc73f2b2300db"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseMessaging.xcframework.zip",
+      checksum: "d5d30740bfc2f39b761dc10bf66363abd1c19b7c87d0bfb715ce3bec02805f42"
     ),
     .binaryTarget(
       name: "_FirebaseMessagingInterop",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseMessagingInterop.xcframework.zip",
-      checksum: "b4535423a8ca6bd8481efe296f8774898bbc9ed3819b18090f2a72267ae20340"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseMessagingInterop.xcframework.zip",
+      checksum: "5cf5403116d2121a3ad830f49d8f53c9be6a767701ff95c5350c04b35f22a744"
     ),
     .binaryTarget(
       name: "_FirebasePerformance",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebasePerformance.xcframework.zip",
-      checksum: "99f80d2b20398f9939b7dd8b0dca5073b43cf9f64d44c564ed273d4c0fd33cdb"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebasePerformance.xcframework.zip",
+      checksum: "3c9f5961bf2ab7616a4194e78a3798e0df67ea6fdac28c1f13fd274cc49d4402"
     ),
     .binaryTarget(
       name: "_FirebaseRemoteConfig",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseRemoteConfig.xcframework.zip",
-      checksum: "078cfeb01fb0a44400f90c31e40b5d59ccc0753310d593aebb9b470887ac1d0e"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseRemoteConfig.xcframework.zip",
+      checksum: "7fbe4ddea6c09606b300b0daeac38185ed470ca9a3ae2d84a8e45dcd0de17c0b"
     ),
     .binaryTarget(
       name: "_FirebaseRemoteConfigInterop",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseRemoteConfigInterop.xcframework.zip",
-      checksum: "04a4982f1bfdef7fa53d014f38d597cab8598b3c2190728c8704a60a294b8d28"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseRemoteConfigInterop.xcframework.zip",
+      checksum: "15172cf1d031c9394e32ec0855417757ab5a5ffdff2139f3413f8d39a19069d1"
     ),
     .binaryTarget(
       name: "_FirebaseSessions",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseSessions.xcframework.zip",
-      checksum: "82a9823afe733e4fa83aac9a42f9825b81aa3db5b027693fc4cc96d134179e3c"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseSessions.xcframework.zip",
+      checksum: "953ab8b9d39d6c9b0c7dc8143c43cedc277378f01ca0a57ae40858f729921780"
     ),
     .binaryTarget(
       name: "_FirebaseSharedSwift",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseSharedSwift.xcframework.zip",
-      checksum: "ef1a79a0f9309d3ab31dfc0af31fa104ffcf72233daadc08c80ea40bce5741a1"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseSharedSwift.xcframework.zip",
+      checksum: "d69d60edf7dae873fda0e7672411776052193f65b00ac7c260be0e3b79093947"
     ),
     .binaryTarget(
       name: "_FirebaseStorage",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_FirebaseStorage.xcframework.zip",
-      checksum: "2e89d26a57886942710c78439907604cd3d6aa41a795050766741536b07d2f9c"
-    ),
-    .binaryTarget(
-      name: "_GTMAppAuth",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_GTMAppAuth.xcframework.zip",
-      checksum: "bdd8b1ad4acc8b3ae540ea8e06c6b34144b215be57916ae11b0db5699ad26714"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_FirebaseStorage.xcframework.zip",
+      checksum: "8c27f8778eb5a715edcb0a928f9ac845e83f18f12163d4f246f812d197c4892a"
     ),
     .binaryTarget(
       name: "_GTMSessionFetcher",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_GTMSessionFetcher.xcframework.zip",
-      checksum: "c26ddd73051df050be1d6deb6e68a968c13820e93364e512745c835d92e65852"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_GTMSessionFetcher.xcframework.zip",
+      checksum: "071b16951a1cb50521ccc6f952b72befe4e0e9571cd674f9c5e734f7cc3fe5f1"
+    ),
+    .binaryTarget(
+      name: "_GoogleAdsOnDeviceConversion",
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_GoogleAdsOnDeviceConversion.xcframework.zip",
+      checksum: "bff8551b24f0a0f691b14d7233113bbbf601cb9f8932d437735a063e1c14d813"
     ),
     .binaryTarget(
       name: "_GoogleAppMeasurement",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_GoogleAppMeasurement.xcframework.zip",
-      checksum: "28d7ac38be48354a86029c4ca8a4a29a21617384d852ab11bc55c849cbdf64cc"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_GoogleAppMeasurement.xcframework.zip",
+      checksum: "79cb2d2aa7ef8a230fd08e8a9d66471408c867e04e8ce5e2cd82ba44f16111b4"
     ),
     .binaryTarget(
       name: "_GoogleAppMeasurementIdentitySupport",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_GoogleAppMeasurementIdentitySupport.xcframework.zip",
-      checksum: "115ce380e3023a6f5f976e077be16da547960fc6d09bedf2979bb0ef38e83b6d"
-    ),
-    .binaryTarget(
-      name: "_GoogleAppMeasurementOnDeviceConversion",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_GoogleAppMeasurementOnDeviceConversion.xcframework.zip",
-      checksum: "8e6b8748a9d23a36b03462985f8a3f5dc1edc504bac7eed5ccd4a0b6c4867810"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_GoogleAppMeasurementIdentitySupport.xcframework.zip",
+      checksum: "5ef92644134733dd0120bab08da028f774cbd85681170eeb973d4c276222c530"
     ),
     .binaryTarget(
       name: "_GoogleDataTransport",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_GoogleDataTransport.xcframework.zip",
-      checksum: "b3c273e493e79739b48b6ca3b301edadfacfc78bb5b98325a461a67c27770de9"
-    ),
-    .binaryTarget(
-      name: "_GoogleMobileAds",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_GoogleMobileAds.xcframework.zip",
-      checksum: "057cd0b1990f823aa6ffacc33249eedb8ef2833ec56b6f758dfe93a14295e025"
-    ),
-    .binaryTarget(
-      name: "_GoogleSignIn",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_GoogleSignIn.xcframework.zip",
-      checksum: "d4d394d1bcbd2c71e88a500a859a9dcff080448cb7acc344ed90950b6a3bf3bc"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_GoogleDataTransport.xcframework.zip",
+      checksum: "bfc0f049d2c63686f016a41cc52502c07fc05d10facb1fa3d1dce29c9859dc74"
     ),
     .binaryTarget(
       name: "_GoogleUtilities",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_GoogleUtilities.xcframework.zip",
-      checksum: "a36beb15257f521a89c8d5cee572d3db1d44c96afa8f2b89872a76b9a09c212b"
-    ),
-    .binaryTarget(
-      name: "_Promises",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_Promises.xcframework.zip",
-      checksum: "8d134be0cefbcd3502eab4b08004b2b40c10fb5a1e5e93f517eb69c224ba6416"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_GoogleUtilities.xcframework.zip",
+      checksum: "26c077d873d3e588276294c49944b05ecb2fb29d4aa08dba90871ea61b2cdaea"
     ),
     .binaryTarget(
       name: "_RecaptchaInterop",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_RecaptchaInterop.xcframework.zip",
-      checksum: "ffedf7d03d223bc522976e028d1822ae8beba75f8b20b6016b4e1da14c931cad"
-    ),
-    .binaryTarget(
-      name: "_SwiftProtobuf",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_SwiftProtobuf.xcframework.zip",
-      checksum: "fb792addb5ed623d585133580f3dfbd4a7151b0dbbec3e859ee24aa9c824c132"
-    ),
-    .binaryTarget(
-      name: "_UserMessagingPlatform",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_UserMessagingPlatform.xcframework.zip",
-      checksum: "050ec3cfe5bc9529c750eba370f6896bd54648ca4beeeb0691e97be73fb184f8"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_RecaptchaInterop.xcframework.zip",
+      checksum: "28f944afff4eb2611877f9598d5a2cd093b26f6b5861243c59e8b25561302301"
     ),
     .binaryTarget(
       name: "_absl",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_absl.xcframework.zip",
-      checksum: "2ef3f20d62ae54d9d561c858d155c6b97bbd536f8ae8150b9b0fa526281d10b7"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_absl.xcframework.zip",
+      checksum: "f35e253b0bd7d8b6cb8d370a3e8d2b34fb0f0ed2e96a9bd532dfa85774d9cc60"
     ),
     .binaryTarget(
       name: "_grpc",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_grpc.xcframework.zip",
-      checksum: "eaf1fa29a3924dde61c991c9ca3d8f48b349bb554c6450f364217cfcf9b9fd19"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_grpc.xcframework.zip",
+      checksum: "73ac1a243c76c67855c755d47dbe63bee00fd831d612a27dfe49a43a1e9116dd"
     ),
     .binaryTarget(
       name: "_grpcpp",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_grpcpp.xcframework.zip",
-      checksum: "418e7513c44bc3e2c37c108c28c3ce62bc897a796dbdb113ab7d6c3841f73b00"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_grpcpp.xcframework.zip",
+      checksum: "ff661b38038708bc630b8c1743a7d5a3bf0119931dd63b2c677d617c39cb3ab3"
     ),
     .binaryTarget(
       name: "_leveldb",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_leveldb.xcframework.zip",
-      checksum: "4fb84d6e446c69a1a6e3cf04379bcc9068cfd77f420c22b4952ca5255ec98c81"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_leveldb.xcframework.zip",
+      checksum: "3057e57d1f1bb8a659ffb34a2a2068c97970ec95e56c061742fd69e28be11951"
     ),
     .binaryTarget(
       name: "_nanopb",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_nanopb.xcframework.zip",
-      checksum: "ee8b09f23499c2a509d9035e693cf7eda6cb22ae6c08bfa8264e476c1820aee9"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_nanopb.xcframework.zip",
+      checksum: "99175e2d80523a476912361a36294f6488904b2be0a30f9079ea89a4859b9e9c"
     ),
     .binaryTarget(
       name: "_openssl_grpc",
-      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/10.24.0/_openssl_grpc.xcframework.zip",
-      checksum: "0e0686825c750e9398fd9f92a1062fe6899d530cf057d38ea8e2e8277a5e3d97"
+      url: "https://github.com/imWildCat/firebase-ios-sdk-xcframeworks/releases/download/13.1.0/_openssl_grpc.xcframework.zip",
+      checksum: "996d8f75ba1824be972508a8346fb854b6360dadf083e15ba39469c446f3c246"
     )
   ]
 )
